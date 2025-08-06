@@ -12,6 +12,6 @@ func (im *InterfaceManager) getInterfaceStatsPlatform(name string) (InterfaceSta
 	// For now, return empty statistics with debug logging
 	im.logger.Debug("interface statistics collection not implemented for Darwin",
 		slog.String("interface", name))
-	
+
 	return InterfaceStats{}, nil
 }

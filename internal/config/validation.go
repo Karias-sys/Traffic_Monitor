@@ -91,7 +91,7 @@ func validateCapture(cfg *Config) error {
 				return fmt.Errorf("no interface specified and unable to determine default: %w", err)
 			}
 			cfg.Interface = defaultInterface.Name
-			slog.Info("using default interface", 
+			slog.Info("using default interface",
 				slog.String("interface", cfg.Interface),
 				slog.Int("index", defaultInterface.Index),
 				slog.Int("mtu", defaultInterface.MTU))

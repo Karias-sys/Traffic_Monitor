@@ -54,7 +54,7 @@ func NewInterfaceManager(logger *slog.Logger) *InterfaceManager {
 func (im *InterfaceManager) GetAllInterfaces() ([]InterfaceInfo, error) {
 	interfaces, err := net.Interfaces()
 	if err != nil {
-		im.logger.Error("failed to enumerate network interfaces", 
+		im.logger.Error("failed to enumerate network interfaces",
 			slog.String("error", err.Error()))
 		return nil, fmt.Errorf("failed to enumerate network interfaces: %w", err)
 	}
@@ -96,7 +96,7 @@ func (im *InterfaceManager) GetAllInterfaces() ([]InterfaceInfo, error) {
 		return interfaceList[i].Index < interfaceList[j].Index
 	})
 
-	im.logger.Info("enumerated network interfaces", 
+	im.logger.Info("enumerated network interfaces",
 		slog.Int("count", len(interfaceList)))
 
 	return interfaceList, nil
@@ -242,7 +242,7 @@ func (im *InterfaceManager) GetDefaultInterface() (*InterfaceInfo, error) {
 		im.logger.Warn("no suitable interfaces found for packet capture, falling back to any up interface")
 		for _, iface := range interfaces {
 			if iface.IsUp && !iface.IsLoopback {
-				im.logger.Info("selected fallback interface", 
+				im.logger.Info("selected fallback interface",
 					slog.String("interface", iface.Name),
 					slog.Int("index", iface.Index))
 				return &iface, nil
@@ -252,7 +252,7 @@ func (im *InterfaceManager) GetDefaultInterface() (*InterfaceInfo, error) {
 	}
 
 	selected := im.selectBestInterface(candidates)
-	im.logger.Info("selected default interface", 
+	im.logger.Info("selected default interface",
 		slog.String("interface", selected.Name),
 		slog.Int("index", selected.Index),
 		slog.String("type", im.getInterfaceType(selected)))
@@ -263,10 +263,10 @@ func (im *InterfaceManager) GetDefaultInterface() (*InterfaceInfo, error) {
 func (im *InterfaceManager) selectBestInterface(candidates []InterfaceInfo) *InterfaceInfo {
 	sort.Slice(candidates, func(i, j int) bool {
 		a, b := &candidates[i], &candidates[j]
-		
+
 		scoreA := im.calculateInterfaceScore(a)
 		scoreB := im.calculateInterfaceScore(b)
-		
+
 		if scoreA != scoreB {
 			return scoreA > scoreB
 		}
@@ -321,20 +321,20 @@ func (im *InterfaceManager) calculateInterfaceScore(info *InterfaceInfo) int {
 
 func (im *InterfaceManager) getInterfaceType(info *InterfaceInfo) string {
 	name := strings.ToLower(info.Name)
-	
+
 	switch {
 	case strings.HasPrefix(name, "eth") || strings.HasPrefix(name, "en"):
 		return "ethernet"
-	case strings.HasPrefix(name, "wlan") || strings.HasPrefix(name, "wl") || 
-		 strings.HasPrefix(name, "wifi") || strings.HasPrefix(name, "ath"):
+	case strings.HasPrefix(name, "wlan") || strings.HasPrefix(name, "wl") ||
+		strings.HasPrefix(name, "wifi") || strings.HasPrefix(name, "ath"):
 		return "wireless"
 	case strings.HasPrefix(name, "br") || strings.HasPrefix(name, "bridge"):
 		return "bridge"
 	case strings.HasPrefix(name, "tun") || strings.HasPrefix(name, "tap") ||
-		 strings.HasPrefix(name, "vpn"):
+		strings.HasPrefix(name, "vpn"):
 		return "tunnel"
 	case strings.HasPrefix(name, "veth") || strings.HasPrefix(name, "docker") ||
-		 strings.HasPrefix(name, "lxc") || strings.HasPrefix(name, "vir"):
+		strings.HasPrefix(name, "lxc") || strings.HasPrefix(name, "vir"):
 		return "virtual"
 	case info.IsLoopback:
 		return "loopback"
@@ -348,7 +348,7 @@ func (im *InterfaceManager) GetDefaultInterfaceForConfig() (*InterfaceInfo, erro
 	if err != nil {
 		return nil, fmt.Errorf("failed to get default interface for config: %w", err)
 	}
-	
+
 	return &InterfaceInfo{
 		Name:  info.Name,
 		Index: info.Index,
@@ -356,4 +356,3 @@ func (im *InterfaceManager) GetDefaultInterfaceForConfig() (*InterfaceInfo, erro
 		Flags: info.Flags,
 	}, nil
 }
-
