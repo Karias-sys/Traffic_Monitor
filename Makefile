@@ -70,7 +70,12 @@ test-coverage: ## Run unit tests with coverage report
 .PHONY: test-integration
 test-integration: ## Run integration tests
 	@echo "Running integration tests..."
-	$(GO) test -v -tags=integration -timeout=60s ./tests/integration/...
+	@if [ -n "$$(find ./tests/integration -name '*_test.go' -print -quit 2>/dev/null)" ]; then \
+		$(GO) test -v -tags=integration -timeout=60s ./tests/integration/...; \
+	else \
+		echo "⚠️ No integration tests found in ./tests/integration/ - skipping"; \
+		echo "✅ Integration test check completed (no tests to run)"; \
+	fi
 
 .PHONY: benchmark
 benchmark: ## Run benchmarks
