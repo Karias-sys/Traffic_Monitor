@@ -1,0 +1,9 @@
+{
+  "exclude": [
+    "G304",
+    "G204"
+  ],
+  "exclude-generated": true,
+  "severity": "medium",
+  "confidence": "medium"
+}
