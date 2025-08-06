@@ -33,6 +33,8 @@ jobs:
         key: ${{ runner.os }}-go-${{ matrix.go-version }}-${{ hashFiles('**/go.sum') }}
         restore-keys: |
           ${{ runner.os }}-go-${{ matrix.go-version }}-
+          ${{ runner.os }}-go-
+      continue-on-error: true  # Don't fail if cache operations have issues
           
     - name: Download dependencies
       run: go mod download
@@ -41,14 +43,38 @@ jobs:
       run: go mod verify
       
     - name: Run go vet
-      run: go vet ./...
+      run: |
+        echo "🔍 Running go vet on ${{ matrix.os }} with Go ${{ matrix.go-version }}"
+        go vet ./...
+        echo "✅ go vet completed successfully"
       
     - name: Run go fmt check
       run: |
-        if [ "$(gofmt -s -l . | wc -l)" -gt 0 ]; then
+        # Normalize line endings on Windows to prevent false positives
+        if [[ "${{ matrix.os }}" == windows-* ]]; then
+          echo "Running on Windows - normalizing line endings"
+          # Install dos2unix if not available
+          if command -v apt-get &> /dev/null; then
+            sudo apt-get update && sudo apt-get install -y dos2unix
+          elif command -v pacman &> /dev/null; then
+            sudo pacman -S --noconfirm dos2unix
+          fi
+          # Convert all Go files to Unix line endings
+          find . -name "*.go" -type f -exec dos2unix {} \; 2>/dev/null || {
+            echo "dos2unix not available, using sed fallback"
+            find . -name "*.go" -type f -exec sed -i 's/\r$//' {} \;
+          }
+        fi
+        
+        # Check formatting
+        UNFORMATTED=$(gofmt -s -l . 2>/dev/null || echo "")
+        if [ ! -z "$UNFORMATTED" ]; then
           echo "Code is not formatted. Run 'go fmt ./...'"
-          gofmt -s -l .
+          echo "Unformatted files:"
+          echo "$UNFORMATTED"
           exit 1
+        else
+          echo "✅ All Go files are properly formatted"
         fi
       shell: bash
       
