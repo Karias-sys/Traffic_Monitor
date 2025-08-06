@@ -13,7 +13,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, macos-14, windows-2022]
-        go-version: [1.21, 1.22]
+        go-version: [1.22, 1.23]
     
     steps:
     - name: Check out code
@@ -25,7 +25,7 @@ jobs:
         go-version: ${{ matrix.go-version }}
         
     - name: Cache Go modules
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: |
           ~/go/pkg/mod
@@ -52,15 +52,24 @@ jobs:
         fi
       shell: bash
       
-    - name: Run tests
-      run: go test -v -race -timeout=30s ./...
-      
-    - name: Run tests with coverage
-      run: go test -v -coverprofile=coverage.out ./...
+    - name: Run tests with conditional coverage
+      run: |
+        if [[ "${{ matrix.os }}" == "ubuntu-latest" && "${{ matrix.go-version }}" == "1.23" ]]; then
+          go test -v -race -timeout=30s -coverprofile=coverage.out -json ./... > test-results.json
+        else
+          go test -v -race -timeout=30s -json ./... > test-results.json
+        fi
+    
+    - name: Upload test results
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: test-results-${{ matrix.os }}-go${{ matrix.go-version }}
+        path: test-results.json
       
     - name: Upload coverage to Codecov
-      if: matrix.os == 'ubuntu-latest' && matrix.go-version == '1.21'
-      uses: codecov/codecov-action@v3
+      if: matrix.os == 'ubuntu-latest' && matrix.go-version == '1.23'
+      uses: codecov/codecov-action@v4
       with:
         file: ./coverage.out
         fail_ci_if_error: true
@@ -77,27 +86,36 @@ jobs:
     - name: Set up Go
       uses: actions/setup-go@v4
       with:
-        go-version: 1.21
+        go-version: 1.23
         
     - name: Cache Go modules
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: |
           ~/go/pkg/mod
           ~/.cache/go-build
-        key: ${{ runner.os }}-go-1.21-${{ hashFiles('**/go.sum') }}
+        key: ${{ runner.os }}-go-1.23-${{ hashFiles('**/go.sum') }}
         restore-keys: |
-          ${{ runner.os }}-go-1.21-
+          ${{ runner.os }}-go-1.23-
           
     - name: Build application
       run: make build
       
-    - name: Test build
+    - name: Test build and smoke tests
       run: |
+        echo "Testing binary execution..."
         ./build/netwatch --help
         
+        echo "Testing version command..."
+        ./build/netwatch --version || echo "Version command not available"
+        
+        echo "Testing configuration validation..."
+        ./build/netwatch --validate-config || echo "Config validation not available"
+        
+        echo "Basic smoke test completed successfully"
+        
     - name: Upload build artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: netwatch-${{ runner.os }}-${{ github.sha }}
         path: build/netwatch
@@ -113,10 +131,10 @@ jobs:
     - name: Set up Go
       uses: actions/setup-go@v4
       with:
-        go-version: 1.21
+        go-version: 1.23
         
     - name: Run golangci-lint
-      uses: golangci/golangci-lint-action@v3
+      uses: golangci/golangci-lint-action@v4
       with:
         version: latest
         args: --timeout=5m
@@ -133,17 +151,17 @@ jobs:
     - name: Set up Go
       uses: actions/setup-go@v4
       with:
-        go-version: 1.21
+        go-version: 1.23
         
     - name: Cache Go modules
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: |
           ~/go/pkg/mod
           ~/.cache/go-build
-        key: ${{ runner.os }}-go-1.21-${{ hashFiles('**/go.sum') }}
+        key: ${{ runner.os }}-go-1.23-${{ hashFiles('**/go.sum') }}
         restore-keys: |
-          ${{ runner.os }}-go-1.21-
+          ${{ runner.os }}-go-1.23-
           
     - name: Build application
       run: make build
