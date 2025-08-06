@@ -3,9 +3,16 @@ package config
 import (
 	"flag"
 	"fmt"
+	"math"
 	"os"
 	"strconv"
 	"time"
+)
+
+const (
+	// Security constants for safe integer conversion
+	MaxInt32 = math.MaxInt32 // 2147483647
+	MinInt32 = math.MinInt32 // -2147483648
 )
 
 type Config struct {
@@ -76,7 +83,12 @@ func loadFromEnv(cfg *Config) error {
 	
 	if snapLen := os.Getenv("NETWATCH_SNAP_LENGTH"); snapLen != "" {
 		if s, err := strconv.ParseInt(snapLen, 10, 32); err == nil {
-			cfg.SnapLength = int32(s)
+			// Additional validation for security (though ParseInt already limits to int32 range)
+			if s < 0 {
+				cfg.SnapLength = 0 // Default to safe value for negative inputs
+			} else {
+				cfg.SnapLength = int32(s)
+			}
 		}
 	}
 	
@@ -195,6 +207,10 @@ func loadFromFlags(cfg *Config) error {
 	cfg.Host = *host
 	cfg.Port = *port
 	cfg.Interface = *iface
+	// Secure conversion with bounds checking to prevent integer overflow
+	if *snapLength < 0 || *snapLength > MaxInt32 {
+		return fmt.Errorf("snap-length must be between 0 and %d, got: %d", MaxInt32, *snapLength)
+	}
 	cfg.SnapLength = int32(*snapLength)
 	cfg.Promiscuous = *promiscuous
 	cfg.Timeout = *timeout
