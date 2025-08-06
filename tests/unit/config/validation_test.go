@@ -16,7 +16,7 @@ func getValidConfig(host string, port int, metricsPort int) *config.Config {
 		Port:          port,
 		MetricsPort:   metricsPort,
 		EnableMetrics: true,
-		
+
 		// Capture settings
 		Interface:       "eth0",
 		SnapLength:      1600,
@@ -25,11 +25,11 @@ func getValidConfig(host string, port int, metricsPort int) *config.Config {
 		FlowTimeout:     5 * time.Minute,
 		MaxFlows:        100000,
 		CleanupInterval: 30 * time.Second,
-		
+
 		// Logging settings
 		LogLevel:  "info",
 		LogFormat: "json",
-		
+
 		// Security settings
 		EnableAuth: false,
 		AuthToken:  "",
@@ -44,13 +44,13 @@ func TestValidateNetwork(t *testing.T) {
 		errorMsg  string
 	}{
 		{
-			name: "valid localhost configuration",
-			cfg: getValidConfig("localhost", 8080, 9090),
+			name:      "valid localhost configuration",
+			cfg:       getValidConfig("localhost", 8080, 9090),
 			wantError: false,
 		},
 		{
-			name: "valid IP address configuration",
-			cfg: getValidConfig("192.168.1.100", 8080, 9090),
+			name:      "valid IP address configuration",
+			cfg:       getValidConfig("192.168.1.100", 8080, 9090),
 			wantError: false,
 		},
 		{
@@ -124,8 +124,8 @@ func TestValidateCapture(t *testing.T) {
 		errorMsg  string
 	}{
 		{
-			name: "valid capture configuration",
-			cfg: getValidConfig("localhost", 8080, 9090),
+			name:      "valid capture configuration",
+			cfg:       getValidConfig("localhost", 8080, 9090),
 			wantError: false,
 		},
 		{
@@ -233,8 +233,8 @@ func TestValidateLogging(t *testing.T) {
 		errorMsg  string
 	}{
 		{
-			name: "valid logging configuration",
-			cfg: getValidConfig("localhost", 8080, 9090),
+			name:      "valid logging configuration",
+			cfg:       getValidConfig("localhost", 8080, 9090),
 			wantError: false,
 		},
 		{
@@ -292,8 +292,8 @@ func TestValidateSecurity(t *testing.T) {
 		errorMsg  string
 	}{
 		{
-			name: "auth disabled",
-			cfg: getValidConfig("localhost", 8080, 9090),
+			name:      "auth disabled",
+			cfg:       getValidConfig("localhost", 8080, 9090),
 			wantError: false,
 		},
 		{

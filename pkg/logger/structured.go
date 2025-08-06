@@ -5,64 +5,64 @@ import (
 )
 
 const (
-	FieldComponent    = "component"
-	FieldOperation    = "operation"
-	FieldDuration     = "duration_ms"
-	FieldError        = "error"
-	FieldPacketCount  = "packet_count"
-	FieldFlowCount    = "flow_count"
-	FieldInterface    = "interface"
-	FieldSourceIP     = "source_ip"
-	FieldDestIP       = "dest_ip"
-	FieldSourcePort   = "source_port"
-	FieldDestPort     = "dest_port"
-	FieldProtocol     = "protocol"
-	FieldBytes        = "bytes"
-	FieldPackets      = "packets"
-	FieldTimestamp    = "timestamp"
-	FieldMemoryUsage  = "memory_usage_mb"
-	FieldCPUUsage     = "cpu_usage_percent"
-	FieldGoroutines   = "goroutines"
-	FieldConnections  = "connections"
-	FieldHTTPMethod   = "http_method"
-	FieldHTTPStatus   = "http_status"
-	FieldHTTPPath     = "http_path"
-	FieldUserAgent    = "user_agent"
-	FieldRemoteAddr   = "remote_addr"
-	FieldRequestID    = "request_id"
+	FieldComponent   = "component"
+	FieldOperation   = "operation"
+	FieldDuration    = "duration_ms"
+	FieldError       = "error"
+	FieldPacketCount = "packet_count"
+	FieldFlowCount   = "flow_count"
+	FieldInterface   = "interface"
+	FieldSourceIP    = "source_ip"
+	FieldDestIP      = "dest_ip"
+	FieldSourcePort  = "source_port"
+	FieldDestPort    = "dest_port"
+	FieldProtocol    = "protocol"
+	FieldBytes       = "bytes"
+	FieldPackets     = "packets"
+	FieldTimestamp   = "timestamp"
+	FieldMemoryUsage = "memory_usage_mb"
+	FieldCPUUsage    = "cpu_usage_percent"
+	FieldGoroutines  = "goroutines"
+	FieldConnections = "connections"
+	FieldHTTPMethod  = "http_method"
+	FieldHTTPStatus  = "http_status"
+	FieldHTTPPath    = "http_path"
+	FieldUserAgent   = "user_agent"
+	FieldRemoteAddr  = "remote_addr"
+	FieldRequestID   = "request_id"
 )
 
 type StructuredFields struct {
-	Component    string        `json:"component,omitempty"`
-	Operation    string        `json:"operation,omitempty"`
-	Duration     time.Duration `json:"duration_ms,omitempty"`
-	Error        string        `json:"error,omitempty"`
-	PacketCount  int64         `json:"packet_count,omitempty"`
-	FlowCount    int64         `json:"flow_count,omitempty"`
-	Interface    string        `json:"interface,omitempty"`
-	SourceIP     string        `json:"source_ip,omitempty"`
-	DestIP       string        `json:"dest_ip,omitempty"`
-	SourcePort   int           `json:"source_port,omitempty"`
-	DestPort     int           `json:"dest_port,omitempty"`
-	Protocol     string        `json:"protocol,omitempty"`
-	Bytes        int64         `json:"bytes,omitempty"`
-	Packets      int64         `json:"packets,omitempty"`
-	Timestamp    time.Time     `json:"timestamp,omitempty"`
-	MemoryUsage  float64       `json:"memory_usage_mb,omitempty"`
-	CPUUsage     float64       `json:"cpu_usage_percent,omitempty"`
-	Goroutines   int           `json:"goroutines,omitempty"`
-	Connections  int           `json:"connections,omitempty"`
-	HTTPMethod   string        `json:"http_method,omitempty"`
-	HTTPStatus   int           `json:"http_status,omitempty"`
-	HTTPPath     string        `json:"http_path,omitempty"`
-	UserAgent    string        `json:"user_agent,omitempty"`
-	RemoteAddr   string        `json:"remote_addr,omitempty"`
-	RequestID    string        `json:"request_id,omitempty"`
+	Component   string        `json:"component,omitempty"`
+	Operation   string        `json:"operation,omitempty"`
+	Duration    time.Duration `json:"duration_ms,omitempty"`
+	Error       string        `json:"error,omitempty"`
+	PacketCount int64         `json:"packet_count,omitempty"`
+	FlowCount   int64         `json:"flow_count,omitempty"`
+	Interface   string        `json:"interface,omitempty"`
+	SourceIP    string        `json:"source_ip,omitempty"`
+	DestIP      string        `json:"dest_ip,omitempty"`
+	SourcePort  int           `json:"source_port,omitempty"`
+	DestPort    int           `json:"dest_port,omitempty"`
+	Protocol    string        `json:"protocol,omitempty"`
+	Bytes       int64         `json:"bytes,omitempty"`
+	Packets     int64         `json:"packets,omitempty"`
+	Timestamp   time.Time     `json:"timestamp,omitempty"`
+	MemoryUsage float64       `json:"memory_usage_mb,omitempty"`
+	CPUUsage    float64       `json:"cpu_usage_percent,omitempty"`
+	Goroutines  int           `json:"goroutines,omitempty"`
+	Connections int           `json:"connections,omitempty"`
+	HTTPMethod  string        `json:"http_method,omitempty"`
+	HTTPStatus  int           `json:"http_status,omitempty"`
+	HTTPPath    string        `json:"http_path,omitempty"`
+	UserAgent   string        `json:"user_agent,omitempty"`
+	RemoteAddr  string        `json:"remote_addr,omitempty"`
+	RequestID   string        `json:"request_id,omitempty"`
 }
 
 func (s StructuredFields) ToMap() map[string]any {
 	fields := make(map[string]any)
-	
+
 	if s.Component != "" {
 		fields[FieldComponent] = s.Component
 	}
@@ -138,7 +138,7 @@ func (s StructuredFields) ToMap() map[string]any {
 	if s.RequestID != "" {
 		fields[FieldRequestID] = s.RequestID
 	}
-	
+
 	return fields
 }
 

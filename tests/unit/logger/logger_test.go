@@ -213,10 +213,10 @@ func TestLoggerLevelFiltering(t *testing.T) {
 
 	output := buf.String()
 	lines := strings.Split(strings.TrimSpace(output), "\n")
-	
+
 	// Should only have warn and error messages
 	assert.Len(t, lines, 2)
-	
+
 	// Verify the messages
 	var logEntry1, logEntry2 map[string]interface{}
 	err = json.Unmarshal([]byte(lines[0]), &logEntry1)

@@ -16,7 +16,7 @@ type MockLogger struct {
 // NewMockLogger creates a new mock logger that writes to a buffer
 func NewMockLogger(level string) (*MockLogger, error) {
 	buf := &bytes.Buffer{}
-	
+
 	l, err := logger.New(logger.Config{
 		Level:  level,
 		Format: "json",
@@ -25,7 +25,7 @@ func NewMockLogger(level string) (*MockLogger, error) {
 	if err != nil {
 		return nil, err
 	}
-	
+
 	return &MockLogger{
 		Logger: l,
 		Buffer: buf,
@@ -48,7 +48,7 @@ func (m *MockLogger) GetLines() []string {
 	if output == "" {
 		return []string{}
 	}
-	
+
 	lines := []string{}
 	for _, line := range bytes.Split([]byte(output), []byte("\n")) {
 		if len(line) > 0 {
@@ -73,6 +73,6 @@ func NewDiscardLogger(level string) (*DiscardLogger, error) {
 	if err != nil {
 		return nil, err
 	}
-	
+
 	return &DiscardLogger{Logger: l}, nil
 }

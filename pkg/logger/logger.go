@@ -23,17 +23,17 @@ func New(cfg Config) (*Logger, error) {
 	if cfg.Writer == nil {
 		cfg.Writer = os.Stdout
 	}
-	
+
 	level, err := parseLevel(cfg.Level)
 	if err != nil {
 		return nil, fmt.Errorf("invalid log level: %w", err)
 	}
-	
+
 	var handler slog.Handler
 	opts := &slog.HandlerOptions{
 		Level: level,
 	}
-	
+
 	switch strings.ToLower(cfg.Format) {
 	case "json":
 		handler = slog.NewJSONHandler(cfg.Writer, opts)
@@ -42,9 +42,9 @@ func New(cfg Config) (*Logger, error) {
 	default:
 		return nil, fmt.Errorf("unsupported log format: %s", cfg.Format)
 	}
-	
+
 	logger := slog.New(handler)
-	
+
 	return &Logger{Logger: logger}, nil
 }
 
