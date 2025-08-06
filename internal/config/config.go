@@ -66,6 +66,11 @@ func Load() (*Config, error) {
 	return cfg, nil
 }
 
+func LoadWithInterfaceValidation(validator InterfaceValidator) (*Config, error) {
+	SetInterfaceValidator(validator)
+	return Load()
+}
+
 func loadFromEnv(cfg *Config) error {
 	if host := os.Getenv("NETWATCH_HOST"); host != "" {
 		cfg.Host = host

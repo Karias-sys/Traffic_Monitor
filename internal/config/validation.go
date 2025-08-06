@@ -2,9 +2,28 @@ package config
 
 import (
 	"fmt"
+	"log/slog"
 	"net"
 	"strings"
 )
+
+type InterfaceValidator interface {
+	ValidateInterface(nameOrIndex string) error
+	GetDefaultInterfaceForConfig() (*InterfaceInfo, error)
+}
+
+type InterfaceInfo struct {
+	Name  string
+	Index int
+	MTU   int
+	Flags net.Flags
+}
+
+var interfaceValidator InterfaceValidator
+
+func SetInterfaceValidator(validator InterfaceValidator) {
+	interfaceValidator = validator
+}
 
 func Validate(cfg *Config) error {
 	if err := validateNetwork(cfg); err != nil {
@@ -64,9 +83,25 @@ func validateNetwork(cfg *Config) error {
 }
 
 func validateCapture(cfg *Config) error {
-	// Validate interface (allow "any" as special case)
+	// Validate interface
 	if cfg.Interface == "" {
-		return fmt.Errorf("interface cannot be empty")
+		if interfaceValidator != nil {
+			defaultInterface, err := interfaceValidator.GetDefaultInterfaceForConfig()
+			if err != nil {
+				return fmt.Errorf("no interface specified and unable to determine default: %w", err)
+			}
+			cfg.Interface = defaultInterface.Name
+			slog.Info("using default interface", 
+				slog.String("interface", cfg.Interface),
+				slog.Int("index", defaultInterface.Index),
+				slog.Int("mtu", defaultInterface.MTU))
+		} else {
+			return fmt.Errorf("interface cannot be empty")
+		}
+	} else if cfg.Interface != "any" && interfaceValidator != nil {
+		if err := interfaceValidator.ValidateInterface(cfg.Interface); err != nil {
+			return fmt.Errorf("interface validation failed: %w", err)
+		}
 	}
 
 	// Validate snap length
