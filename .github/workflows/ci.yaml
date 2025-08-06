@@ -67,12 +67,26 @@ jobs:
         name: test-results-${{ matrix.os }}-go${{ matrix.go-version }}
         path: test-results.json
       
+    - name: Display coverage summary
+      if: matrix.os == 'ubuntu-latest' && matrix.go-version == '1.23'
+      run: |
+        if [ -f coverage.out ]; then
+          echo "📊 Coverage Report Generated"
+          go tool cover -func=coverage.out | tail -1
+          echo "Coverage file size: $(wc -c < coverage.out) bytes"
+        else
+          echo "⚠️ No coverage file found"
+        fi
+    
     - name: Upload coverage to Codecov
       if: matrix.os == 'ubuntu-latest' && matrix.go-version == '1.23'
       uses: codecov/codecov-action@v4
       with:
         file: ./coverage.out
-        fail_ci_if_error: true
+        token: ${{ secrets.CODECOV_TOKEN }}
+        fail_ci_if_error: false  # Don't fail CI if Codecov upload fails
+        verbose: true
+      continue-on-error: true  # Allow workflow to continue if Codecov is unavailable
 
   build:
     name: Build
