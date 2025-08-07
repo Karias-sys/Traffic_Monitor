@@ -9,6 +9,9 @@ on:
     types: [opened, assigned]
   pull_request_review:
     types: [submitted]
+  workflow_run:
+    workflows: ["*"]
+    types: [completed]
 
 jobs:
   claude:
@@ -16,7 +19,8 @@ jobs:
       (github.event_name == 'issue_comment' && contains(github.event.comment.body, '@claude')) ||
       (github.event_name == 'pull_request_review_comment' && contains(github.event.comment.body, '@claude')) ||
       (github.event_name == 'pull_request_review' && contains(github.event.review.body, '@claude')) ||
-      (github.event_name == 'issues' && (contains(github.event.issue.body, '@claude') || contains(github.event.issue.title, '@claude')))
+      (github.event_name == 'issues' && (contains(github.event.issue.body, '@claude') || contains(github.event.issue.title, '@claude'))) ||
+      (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'failure')
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -24,6 +28,8 @@ jobs:
       issues: read
       id-token: write
       actions: read # Required for Claude to read CI results on PRs
+      checks: read # Required for Claude to read workflow check results
+      statuses: read # Required for Claude to read workflow status
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -35,6 +41,7 @@ jobs:
         uses: anthropics/claude-code-action@beta
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          #github_token: ${{ secrets.GITHUB_TOKEN }}
 
           # This is an optional setting that allows Claude to read CI results on PRs
           additional_permissions: |
