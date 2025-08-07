@@ -9,14 +9,17 @@ func getDefaults() *Config {
 		Port: 8080,
 
 		// Capture configuration - optimized for performance
-		Interface:       "any",                  // Capture on all interfaces by default
-		SnapLength:      1600,                   // Sufficient for most packets including headers
-		Promiscuous:     false,                  // Start non-promiscuous for security
-		Timeout:         100 * time.Millisecond, // Balance between responsiveness and CPU usage
-		BufferSize:      32 * 1024 * 1024,       // 32MB buffer for high throughput
-		FlowTimeout:     5 * time.Minute,        // Flow idle timeout
-		MaxFlows:        100000,                 // Maximum flows to track (memory limit consideration)
-		CleanupInterval: 30 * time.Second,       // Regular cleanup to maintain <5% CPU target
+		Interface:         "any",                  // Capture on all interfaces by default
+		SnapLength:        1600,                   // Sufficient for most packets including headers
+		Promiscuous:       false,                  // Start non-promiscuous for security
+		Timeout:           100 * time.Millisecond, // Balance between responsiveness and CPU usage
+		BufferSize:        32 * 1024 * 1024,       // 32MB buffer for high throughput
+		RingBlockSize:     32 * 1024,              // 32KB blocks for TPACKETv3 ring buffer
+		RingBlockCount:    1024,                   // 1024 blocks = 32MB total ring buffer
+		ChannelBufferSize: 1000,                   // Buffered channel for packet processing
+		FlowTimeout:       5 * time.Minute,        // Flow idle timeout
+		MaxFlows:          100000,                 // Maximum flows to track (memory limit consideration)
+		CleanupInterval:   30 * time.Second,       // Regular cleanup to maintain <5% CPU target
 
 		// Logging configuration
 		LogLevel:  "info", // Default to info level

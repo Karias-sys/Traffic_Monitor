@@ -21,14 +21,17 @@ type Config struct {
 	Port int    `json:"port"`
 
 	// Capture configuration
-	Interface       string        `json:"interface"`
-	SnapLength      int32         `json:"snap_length"`
-	Promiscuous     bool          `json:"promiscuous"`
-	Timeout         time.Duration `json:"timeout"`
-	BufferSize      int           `json:"buffer_size"`
-	FlowTimeout     time.Duration `json:"flow_timeout"`
-	MaxFlows        int           `json:"max_flows"`
-	CleanupInterval time.Duration `json:"cleanup_interval"`
+	Interface         string        `json:"interface"`
+	SnapLength        int32         `json:"snap_length"`
+	Promiscuous       bool          `json:"promiscuous"`
+	Timeout           time.Duration `json:"timeout"`
+	BufferSize        int           `json:"buffer_size"`
+	RingBlockSize     uint32        `json:"ring_block_size"`
+	RingBlockCount    uint32        `json:"ring_block_count"`
+	ChannelBufferSize int           `json:"channel_buffer_size"`
+	FlowTimeout       time.Duration `json:"flow_timeout"`
+	MaxFlows          int           `json:"max_flows"`
+	CleanupInterval   time.Duration `json:"cleanup_interval"`
 
 	// Logging configuration
 	LogLevel  string `json:"log_level"`
@@ -115,6 +118,24 @@ func loadFromEnv(cfg *Config) error {
 		}
 	}
 
+	if ringBlockSize := os.Getenv("NETWATCH_RING_BLOCK_SIZE"); ringBlockSize != "" {
+		if r, err := strconv.ParseUint(ringBlockSize, 10, 32); err == nil {
+			cfg.RingBlockSize = uint32(r)
+		}
+	}
+
+	if ringBlockCount := os.Getenv("NETWATCH_RING_BLOCK_COUNT"); ringBlockCount != "" {
+		if r, err := strconv.ParseUint(ringBlockCount, 10, 32); err == nil {
+			cfg.RingBlockCount = uint32(r)
+		}
+	}
+
+	if channelBufferSize := os.Getenv("NETWATCH_CHANNEL_BUFFER_SIZE"); channelBufferSize != "" {
+		if c, err := strconv.Atoi(channelBufferSize); err == nil {
+			cfg.ChannelBufferSize = c
+		}
+	}
+
 	if flowTimeout := os.Getenv("NETWATCH_FLOW_TIMEOUT"); flowTimeout != "" {
 		if f, err := time.ParseDuration(flowTimeout); err == nil {
 			cfg.FlowTimeout = f
@@ -194,6 +215,9 @@ func loadFromFlags(cfg *Config) error {
 	promiscuous := flag.Bool("promiscuous", cfg.Promiscuous, "Enable promiscuous mode")
 	timeout := flag.Duration("timeout", cfg.Timeout, "Packet capture timeout")
 	bufferSize := flag.Int("buffer-size", cfg.BufferSize, "Packet capture buffer size")
+	ringBlockSize := flag.Uint("ring-block-size", uint(cfg.RingBlockSize), "Ring buffer block size")
+	ringBlockCount := flag.Uint("ring-block-count", uint(cfg.RingBlockCount), "Ring buffer block count")
+	channelBufferSize := flag.Int("channel-buffer-size", cfg.ChannelBufferSize, "Packet channel buffer size")
 	flowTimeout := flag.Duration("flow-timeout", cfg.FlowTimeout, "Flow timeout duration")
 	maxFlows := flag.Int("max-flows", cfg.MaxFlows, "Maximum number of flows to track")
 	cleanupInterval := flag.Duration("cleanup-interval", cfg.CleanupInterval, "Flow cleanup interval")
@@ -220,6 +244,9 @@ func loadFromFlags(cfg *Config) error {
 	cfg.Promiscuous = *promiscuous
 	cfg.Timeout = *timeout
 	cfg.BufferSize = *bufferSize
+	cfg.RingBlockSize = uint32(*ringBlockSize)
+	cfg.RingBlockCount = uint32(*ringBlockCount)
+	cfg.ChannelBufferSize = *channelBufferSize
 	cfg.FlowTimeout = *flowTimeout
 	cfg.MaxFlows = *maxFlows
 	cfg.CleanupInterval = *cleanupInterval
